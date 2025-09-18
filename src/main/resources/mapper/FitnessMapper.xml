@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.multi.fitnesstracker.mapper.FitnessMapper">
+    <resultMap id="fitnessMap" type="com.multi.fitnesstracker.domain.Fitness">
+        <id property="id" column="id"/>
+        <result property="exerciseName" column="exercise_name"/>
+        <result property="workoutDate" column="workout_date"/>
+        <result property="durationMin" column="duration_min"/>
+        <result property="calories" column="calories"/>
+        <result property="memo" column="memo"/>
+        <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <select id="getAllFitness" resultType="com.multi.fitnesstracker.domain.Fitness">
+        SELECT * FROM workout
+        ORDER BY id DESC
+    </select>
+
+    <select id="getFitnessById" parameterType="int" resultType="com.multi.fitnesstracker.domain.Fitness">
+        SELECT * FROM workout
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insertFitness" parameterType="com.multi.fitnesstracker.domain.Fitness" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO workout(exercise_name, workout_date, duration_min, calories, memo)
+        VALUES (#{exerciseName},#{workoutDate},#{durationMin},#{calories},#{memo})
+    </insert>
+
+    <update id="updateFitness">
+        UPDATE workout
+        SET exercise_name = #{exerciseName}, workout_date = #{workoutDate}, duration_min = #{durationMin},
+            calories = #{calories}, memo = #{memo}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteFitness">
+        DELETE FROM workout WHERE id = #{id}
+    </delete>
+
+    <select id="count" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM workout
+        <where>
+            <if test="q != null and q != ''">
+                AND exercise_name LIKE CONCAT('%', #{q}, '%')
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND workout_date &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND workout_date &lt;= #{endDate}
+            </if>
+        </where>
+    </select>
+
+    <select id="find" parameterType="map" resultMap="fitnessMap">
+        SELECT id, exercise_name, workout_date, duration_min, calories, memo, created_at
+        FROM workout
+        <where>
+            <if test="q != null and q != ''">
+                AND exercise_name LIKE CONCAT('%', #{q}, '%')
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND workout_date &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND workout_date &lt;= #{endDate}
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+</mapper>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>운동 목록</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+    <h2><a th:href="@{'/fitness'}">운동 기록 목록</a></h2>
+
+    <!-- 검색 영역 -->
+    <form class="row g-3 mb-3">
+        <div class="col-md-4">
+            <input type="text" class="form-control" name="q"  placeholder="운동명 검색">
+        </div>
+        <div class="col-md-3">
+            <input type="date" class="form-control" name="startDate">
+        </div>
+        <div class="col-md-3">
+            <input type="date" class="form-control" name="endDate">
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">검색</button>
+        </div>
+    </form>
+
+    <!-- 목록 테이블 -->
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>운동명</th>
+            <th>날짜</th>
+            <th>시간(분)</th>
+            <th>칼로리</th>
+            <th>상세</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="fitness : ${fitness}">
+            <td th:text="${fitness.id}"></td>
+            <td th:text="${fitness.exerciseName}"></td>
+            <td th:text="${fitness.workoutDate}"></td>
+            <td th:text="${fitness.durationMin}"></td>
+            <td th:text="${fitness.calories}"></td>
+            <td><a th:href="@{'/fitness/view'(id=${fitness.id})}">이동</a></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 페이징 -->
+    <nav>
+        <ul class="pagination justify-content-center">
+            <li th:classappend="${!pagination.hasPrev} ? ' disabled' : ''" class="page-item">
+                <a class="page-link"
+                   th:href="@{/fitness(page=${pagination.prevPage}, q=${q}, startDate=${startDate}, endDate=${endDate})}"
+                   aria-label="Previous">이전</a>
+            </li>
+            <li th:each="p : ${#numbers.sequence(pagination.startPage, pagination.endPage)}"
+                th:classappend="${p == pagination.page} ? ' active' : ''"
+                class="page-item">
+                <a class="page-link"
+                   th:href="@{/fitness(page=${p}, q=${q}, startDate=${startDate}, endDate=${endDate})}"
+                   th:text="${p}">1</a>
+            </li>
+            <li th:classappend="${!pagination.hasNext} ? ' disabled' : ''" class="page-item">
+                <a class="page-link"
+                   th:href="@{/fitness(page=${pagination.nextPage}, q=${q}, startDate=${startDate}, endDate=${endDate})}"
+                   aria-label="Next">다음</a>
+            </li>
+        </ul>
+    </nav>
+
+    <a class="btn btn-success" href="/fitness/new" >운동 기록 추가</a>
+</div>
+</body>
+</html>
